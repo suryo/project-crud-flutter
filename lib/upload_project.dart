@@ -2,12 +2,10 @@ import 'dart:convert'; // Add this import
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter_quill/flutter_quill.dart' as quill;
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as path;
 import 'package:mime/mime.dart';
 import 'package:http_parser/http_parser.dart';
-import 'package:vsc_quill_delta_to_html/vsc_quill_delta_to_html.dart';
 
 class UploadProject extends StatefulWidget {
   @override
@@ -16,16 +14,14 @@ class UploadProject extends StatefulWidget {
 
 class _UploadProjectState extends State<UploadProject> {
   final _formKey = GlobalKey<FormState>();
-  final _projectController = TextEditingController();
+  final _contentController = TextEditingController();
   final _authorController = TextEditingController();
   final _priceController = TextEditingController();
   final _slugController = TextEditingController();
-  final _shortDescController = TextEditingController();
   final _statusController = TextEditingController(text: 'active'); // Set default value to 'active'
   File? _fileProject;
 
-  quill.QuillController _descController = quill.QuillController.basic();
-
+ 
   Future<void> _pickFile() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
@@ -45,29 +41,20 @@ class _UploadProjectState extends State<UploadProject> {
     if (_formKey.currentState!.validate()) {
       var request = http.MultipartRequest(
         'POST',
-        Uri.parse('your endpoint'),
+        Uri.parse('http://zonainformatika.com/api/testcrud'),
       );
 
-      request.fields['project'] = _projectController.text;
+      request.fields['content'] = _contentController.text;
       request.fields['author'] = _authorController.text;
       request.fields['price'] = _priceController.text;
       request.fields['slug'] = _slugController.text;
-      request.fields['short_desc'] = _shortDescController.text;
-
- final jsondesc = jsonEncode(_descController.document.toDelta());
-
-  // final converter = QuillDeltaToHtmlConverter(
-  //      jsondesc.encodeHtml(),
-  // );
-
-      request.fields['desc'] = jsondesc;
       request.fields['status'] = _statusController.text;
 
       if (_fileProject != null) {
         final mimeTypeData = lookupMimeType(_fileProject!.path)!.split('/');
         request.files.add(
           http.MultipartFile(
-            'file_project',
+            'file_content',
             _fileProject!.readAsBytes().asStream(),
             _fileProject!.lengthSync(),
             filename: path.basename(_fileProject!.path),
@@ -81,11 +68,11 @@ class _UploadProjectState extends State<UploadProject> {
       var responseData = await http.Response.fromStream(response);
       if (response.statusCode == 200) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Project uploaded successfully. Status code: ${response.statusCode}')),
+          SnackBar(content: Text('Content uploaded successfully. Status code: ${response.statusCode}')),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to upload project. Status code: ${response.statusCode}. ${responseData.body}')),
+          SnackBar(content: Text('Failed to upload content. Status code: ${response.statusCode}. ${responseData.body}')),
         );
       }
     }
@@ -95,7 +82,7 @@ class _UploadProjectState extends State<UploadProject> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Upload Project'),
+        title: Text('Test CRUD'),
       ),
       body: Padding(
         padding: EdgeInsets.all(16.0),
@@ -104,11 +91,11 @@ class _UploadProjectState extends State<UploadProject> {
           child: ListView(
             children: <Widget>[
               TextFormField(
-                controller: _projectController,
-                decoration: InputDecoration(labelText: 'Project'),
+                controller: _contentController,
+                decoration: InputDecoration(labelText: 'Content'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter a project name';
+                    return 'Please enter a content name';
                   }
                   return null;
                 },
@@ -143,40 +130,7 @@ class _UploadProjectState extends State<UploadProject> {
                   return null;
                 },
               ),
-              TextFormField(
-                controller: _shortDescController,
-                decoration: InputDecoration(labelText: 'Short Description'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter a short description';
-                  }
-                  return null;
-                },
-              ),
-              quill.QuillToolbar.simple(
-                configurations: quill.QuillSimpleToolbarConfigurations(
-                  controller: _descController,
-                  sharedConfigurations: const quill.QuillSharedConfigurations(
-                    locale: Locale('en'), // Sesuaikan dengan kebutuhan Anda
-                  ),
-                ),
-              ),
-              Container(
-                padding: EdgeInsets.all(8.0),
-                height: 200,
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey), // Tambahkan border
-                  borderRadius: BorderRadius.circular(8.0), // Tambahkan radius border
-                ),
-                child: quill.QuillEditor.basic(
-                  configurations: quill.QuillEditorConfigurations(
-                    controller: _descController,
-                    sharedConfigurations: const quill.QuillSharedConfigurations(
-                      locale: Locale('en'), // Sesuaikan dengan kebutuhan Anda
-                    ),
-                  ),
-                ),
-              ),
+             
               SizedBox(height: 20),
               ElevatedButton(
                 onPressed: _pickFile,
@@ -189,7 +143,7 @@ class _UploadProjectState extends State<UploadProject> {
               SizedBox(height: 20),
               ElevatedButton(
                 onPressed: _uploadProject,
-                child: Text('Upload Project'),
+                child: Text('Upload Content'),
               ),
             ],
           ),

@@ -5,12 +5,12 @@ import 'project.dart'; // Ganti "project.dart" dengan nama file yang sesuai
 
 class ProjectList extends StatelessWidget {
   Future<List<Project>> _fetchProjects() async {
-    final response = await http.get(Uri.parse('your endpoint'));
+    final response = await http.get(Uri.parse('http://zonainformatika.com/api/testcrud'));
     if (response.statusCode == 200) {
       Iterable data = jsonDecode(response.body);
       return data.map((json) => Project.fromJson(json)).toList();
     } else {
-      throw Exception('Failed to load projects');
+      throw Exception('Failed to load content');
     }
   }
 
@@ -18,7 +18,7 @@ class ProjectList extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Projects'),
+        title: Text('Content Test CRUD'),
       ),
       body: FutureBuilder<List<Project>>(
         future: _fetchProjects(),
@@ -32,7 +32,7 @@ class ProjectList extends StatelessWidget {
               itemCount: snapshot.data!.length,
               itemBuilder: (context, index) {
                 return ListTile(
-                  title: Text(snapshot.data![index].project),
+                  title: Text(snapshot.data![index].content),
                   subtitle: Text(snapshot.data![index].author),
                   // Tambahkan informasi lainnya sesuai kebutuhan
                 );
