@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'project.dart'; // Ganti "project.dart" dengan nama file yang sesuai
+import 'project.dart';
 
 class ProjectList extends StatelessWidget {
   Future<List<Project>> _fetchProjects() async {
@@ -34,7 +34,13 @@ class ProjectList extends StatelessWidget {
                 return ListTile(
                   title: Text(snapshot.data![index].content),
                   subtitle: Text(snapshot.data![index].author),
-                  // Tambahkan informasi lainnya sesuai kebutuhan
+                  onTap: () {
+                    Navigator.pushNamed(
+                      context,
+                      '/detail',
+                      arguments: snapshot.data![index].id,
+                    );
+                  },
                 );
               },
             );
@@ -43,7 +49,7 @@ class ProjectList extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.pushNamed(context, '/upload'); // Ganti '/upload' dengan rute untuk halaman unggah proyek
+          Navigator.pushNamed(context, '/upload');
         },
         child: Icon(Icons.add),
       ),

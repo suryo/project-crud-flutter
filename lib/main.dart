@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'upload_project.dart';
 import 'project_list.dart';
+import 'project_detail.dart';
+import 'edit_project.dart';
 
 void main() {
   runApp(MyApp());
@@ -16,8 +18,10 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: '/',
       routes: {
-        '/': (context) => ProjectList(), // Halaman utama menampilkan daftar proyek
-        '/upload': (context) => UploadProject(), // Halaman unggah proyek
+        '/': (context) => ProjectList(),
+        '/upload': (context) => UploadProject(),
+        '/detail': (context) => ProjectDetail(),
+        '/edit': (context) => EditProject(),
       },
     );
   }
