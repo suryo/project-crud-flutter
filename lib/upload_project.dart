@@ -1,4 +1,4 @@
-import 'dart:convert'; // Add this import
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
@@ -16,12 +16,8 @@ class _UploadProjectState extends State<UploadProject> {
   final _formKey = GlobalKey<FormState>();
   final _contentController = TextEditingController();
   final _authorController = TextEditingController();
-  final _priceController = TextEditingController();
-  final _slugController = TextEditingController();
-  final _statusController = TextEditingController(text: 'active'); // Set default value to 'active'
   File? _fileProject;
 
- 
   Future<void> _pickFile() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
@@ -32,8 +28,6 @@ class _UploadProjectState extends State<UploadProject> {
       setState(() {
         _fileProject = File(result.files.single.path!);
       });
-    } else {
-      // User canceled the picker
     }
   }
 
@@ -46,9 +40,6 @@ class _UploadProjectState extends State<UploadProject> {
 
       request.fields['content'] = _contentController.text;
       request.fields['author'] = _authorController.text;
-      request.fields['price'] = _priceController.text;
-      request.fields['slug'] = _slugController.text;
-      request.fields['status'] = _statusController.text;
 
       if (_fileProject != null) {
         final mimeTypeData = lookupMimeType(_fileProject!.path)!.split('/');
@@ -64,12 +55,12 @@ class _UploadProjectState extends State<UploadProject> {
       }
 
       var response = await request.send();
-
       var responseData = await http.Response.fromStream(response);
       if (response.statusCode == 200) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Content uploaded successfully. Status code: ${response.statusCode}')),
         );
+        Navigator.pop(context, true);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Failed to upload content. Status code: ${response.statusCode}. ${responseData.body}')),
@@ -110,27 +101,6 @@ class _UploadProjectState extends State<UploadProject> {
                   return null;
                 },
               ),
-              TextFormField(
-                controller: _priceController,
-                decoration: InputDecoration(labelText: 'Price'),
-                validator: (value) {
-                  if (value != null && double.tryParse(value) == null) {
-                    return 'Please enter a valid price';
-                  }
-                  return null;
-                },
-              ),
-              TextFormField(
-                controller: _slugController,
-                decoration: InputDecoration(labelText: 'Slug'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter a slug';
-                  }
-                  return null;
-                },
-              ),
-             
               SizedBox(height: 20),
               ElevatedButton(
                 onPressed: _pickFile,

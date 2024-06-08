@@ -30,8 +30,11 @@ class ProjectDetail extends StatelessWidget {
         actions: [
           IconButton(
             icon: Icon(Icons.edit),
-            onPressed: () {
-              Navigator.pushNamed(context, '/edit', arguments: id);
+            onPressed: () async {
+              final result = await Navigator.pushNamed(context, '/edit', arguments: id);
+              if (result == true) {
+                Navigator.pop(context, true);
+              }
             },
           ),
           IconButton(
@@ -41,7 +44,7 @@ class ProjectDetail extends StatelessWidget {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(content: Text('Project deleted successfully')),
               );
-              Navigator.pop(context);
+              Navigator.pop(context, true);
             },
           ),
         ],

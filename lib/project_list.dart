@@ -3,7 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'project.dart';
 
-class ProjectList extends StatelessWidget {
+class ProjectList extends StatefulWidget {
+  @override
+  _ProjectListState createState() => _ProjectListState();
+}
+
+class _ProjectListState extends State<ProjectList> {
   Future<List<Project>> _fetchProjects() async {
     final response = await http.get(Uri.parse('http://zonainformatika.com/api/testcrud'));
     if (response.statusCode == 200) {
@@ -41,12 +46,15 @@ class ProjectList extends StatelessWidget {
                 return ListTile(
                   title: Text(snapshot.data![index].content),
                   subtitle: Text(snapshot.data![index].author),
-                  onTap: () {
-                    Navigator.pushNamed(
+                  onTap: () async {
+                    final result = await Navigator.pushNamed(
                       context,
                       '/detail',
                       arguments: snapshot.data![index].id,
                     );
+                    if (result == true) {
+                      setState(() {});
+                    }
                   },
                   trailing: IconButton(
                     icon: Icon(Icons.delete),
@@ -55,8 +63,7 @@ class ProjectList extends StatelessWidget {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(content: Text('Project deleted successfully')),
                       );
-                      // Refresh the list after deletion
-                      (context as Element).reassemble();
+                      setState(() {});
                     },
                   ),
                 );
@@ -66,8 +73,11 @@ class ProjectList extends StatelessWidget {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.pushNamed(context, '/upload');
+        onPressed: () async {
+          final result = await Navigator.pushNamed(context, '/upload');
+          if (result == true) {
+            setState(() {});
+          }
         },
         child: Icon(Icons.add),
       ),
