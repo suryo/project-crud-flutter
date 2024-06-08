@@ -13,6 +13,13 @@ class ProjectDetail extends StatelessWidget {
     }
   }
 
+  Future<void> _deleteProject(int id) async {
+    final response = await http.delete(Uri.parse('http://zonainformatika.com/api/testcrud/$id'));
+    if (response.statusCode != 200) {
+      throw Exception('Failed to delete project');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final int id = ModalRoute.of(context)!.settings.arguments as int;
@@ -25,6 +32,16 @@ class ProjectDetail extends StatelessWidget {
             icon: Icon(Icons.edit),
             onPressed: () {
               Navigator.pushNamed(context, '/edit', arguments: id);
+            },
+          ),
+          IconButton(
+            icon: Icon(Icons.delete),
+            onPressed: () async {
+              await _deleteProject(id);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Project deleted successfully')),
+              );
+              Navigator.pop(context);
             },
           ),
         ],

@@ -14,6 +14,13 @@ class ProjectList extends StatelessWidget {
     }
   }
 
+  Future<void> _deleteProject(int id) async {
+    final response = await http.delete(Uri.parse('http://zonainformatika.com/api/testcrud/$id'));
+    if (response.statusCode != 200) {
+      throw Exception('Failed to delete project');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -41,6 +48,17 @@ class ProjectList extends StatelessWidget {
                       arguments: snapshot.data![index].id,
                     );
                   },
+                  trailing: IconButton(
+                    icon: Icon(Icons.delete),
+                    onPressed: () async {
+                      await _deleteProject(snapshot.data![index].id);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Project deleted successfully')),
+                      );
+                      // Refresh the list after deletion
+                      (context as Element).reassemble();
+                    },
+                  ),
                 );
               },
             );
